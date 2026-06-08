@@ -21,6 +21,29 @@ body{
     gap:30px;
     background-image: url(cal.jpg);
 }
+#scientificBtn{
+    position:absolute;
+    top:20px;
+    left:20px;
+    padding:12px 18px;
+    border:none;
+    border-radius:10px;
+    background:#ff9500;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#scientificPanel{
+    display:none;
+    margin-bottom:15px;
+}
+
+#scientificPanel.active{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
 #floatingText{
     position:absolute;
     top:30px;
@@ -133,12 +156,16 @@ button:hover{
 </style>
 </head>
 <body>
+<button id="scientificBtn" onclick="window.location.href='sci.html'">
+    🔬 Scientific Calculator
+</button>
 <h1 id="floatingText">Basic Calculator💡</h1>
 <div class="calculator">
     <input type="text" id="display" readonly>
 
     <div class="buttons">
         <button class="clear" onclick="clearDisplay()">C</button>
+        <button class="operator" onclick="backspace()">⌫</button>
         <button class="operator" onclick="appendValue('/')">÷</button>
         <button class="operator" onclick="appendValue('*')">×</button>
         <button class="operator" onclick="appendValue('-')">−</button>
@@ -151,12 +178,13 @@ button:hover{
         <button class="number" onclick="appendValue('4')">4</button>
         <button class="number" onclick="appendValue('5')">5</button>
         <button class="number" onclick="appendValue('6')">6</button>
-        <button class="equal" onclick="calculate()">=</button>
+        <button class="operator" onclick="toggleSign()">±</button>
 
         <button class="number" onclick="appendValue('1')">1</button>
         <button class="number" onclick="appendValue('2')">2</button>
         <button class="number" onclick="appendValue('3')">3</button>
         <button class="number" onclick="appendValue('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
 
         <button class="number" onclick="appendValue('0')" style="grid-column:span 4;">
             0
@@ -185,6 +213,9 @@ function appendValue(value){
 function clearDisplay(){
     display.value = "";
 }
+function backspace(){
+    display.value = display.value.slice(0, -1);
+}
 
 function calculate(){
     try{
@@ -207,7 +238,15 @@ function calculate(){
         display.value = "Error";
     }
 }
+function toggleSign() {
+    if (display.value === "") return;
 
+    if (display.value.startsWith("-")) {
+        display.value = display.value.substring(1);
+    } else {
+        display.value = "-" + display.value;
+    }
+}
 function updateHistory(){
     historyList.innerHTML = "";
 
@@ -228,7 +267,7 @@ let position = 30;
 let direction = 1;
 
 setInterval(() => {
-    position += direction * 0.2; // smaller movement = slower
+    position += direction * 0.2; 
 
     if (position >= 50) {
         direction = -1;
