@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scientific Calculator</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    background-image: url(cal.jpg);
+}
+
+.calculator{
+    background:rgba(34,34,34,0.5);
+    padding:20px;
+    border-radius:15px;
+    width:420px;
+    backdrop-filter:blur(5px);
+}
+
+#display{
+    width:100%;
+    height:60px;
+    border:none;
+    border-radius:8px;
+    margin-bottom:15px;
+    text-align:right;
+    font-size:28px;
+    padding:10px;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+button{
+    height:55px;
+    border:none;
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    opacity:0.8;
+    transform:scale(1.05);
+}
+
+.number{
+    background:#e0e0e0;
+}
+
+.operator{
+    background:#ff9500;
+    color:white;
+}
+
+.clear{
+    background:#ff3b30;
+    color:white;
+}
+
+.equal{
+    background:#34c759;
+    color:white;
+}
+
+.history{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:280px;
+    background:rgba(34,34,34,0.5);
+    color:white;
+    padding:15px;
+    border-radius:15px;
+    backdrop-filter:blur(5px);
+}
+
+.history h2{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+#historyList{
+    list-style:none;
+}
+
+#historyList li{
+    padding:5px;
+    border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.clear-history{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:red;
+    color:white;
+    border:none;
+    border-radius:8px;
+}
+
+@media(max-width:768px){
+    .history{
+        display:none;
+    }
+
+    .calculator{
+        width:95%;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="calculator">
+
+<input type="text" id="display" readonly>
+
+<div class="buttons">
+
+<button class="clear" onclick="clearDisplay()">C</button>
+<button class="operator" onclick="backspace()">⌫</button>
+<button class="operator" onclick="toggleSign()">±</button>
+<button class="operator" onclick="appendValue('/')">÷</button>
+
+<button class="operator" onclick="sinDeg()">sin</button>
+<button class="operator" onclick="cosDeg()">cos</button>
+<button class="operator" onclick="tanDeg()">tan</button>
+<button class="operator" onclick="appendValue('*')">×</button>
+
+<button class="operator" onclick="squareRoot()">√</button>
+<button class="operator" onclick="square()">x²</button>
+<button class="operator" onclick="appendValue(Math.PI)">π</button>
+<button class="operator" onclick="appendValue('-')">−</button>
+
+<button class="number" onclick="appendValue('7')">7</button>
+<button class="number" onclick="appendValue('8')">8</button>
+<button class="number" onclick="appendValue('9')">9</button>
+<button class="operator" onclick="appendValue('+')">+</button>
+
+<button class="number" onclick="appendValue('4')">4</button>
+<button class="number" onclick="appendValue('5')">5</button>
+<button class="number" onclick="appendValue('6')">6</button>
+<button class="equal" onclick="calculate()">=</button>
+
+<button class="number" onclick="appendValue('1')">1</button>
+<button class="number" onclick="appendValue('2')">2</button>
+<button class="number" onclick="appendValue('3')">3</button>
+<button class="number" onclick="appendValue('.')">.</button>
+
+<button class="number" onclick="appendValue('0')" style="grid-column:span 4;">0</button>
+
+</div>
+</div>
+
+<div class="history">
+<h2>History</h2>
+<ul id="historyList"></ul>
+<button class="clear-history" onclick="clearHistory()">Clear History</button>
+</div>
+
+<script>
+
+const display=document.getElementById("display");
+const historyList=document.getElementById("historyList");
+
+let history=[];
+
+function appendValue(value){
+    display.value+=value;
+}
+
+function clearDisplay(){
+    display.value="";
+}
+
+function backspace(){
+    display.value=display.value.slice(0,-1);
+}
+
+function toggleSign(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=value*-1;
+    }
+}
+
+function calculate(){
+    try{
+        let expression=display.value;
+        let result=eval(expression);
+
+        let record=expression+" = "+result;
+
+        history.unshift(record);
+
+        if(history.length>10){
+            history.pop();
+        }
+
+        updateHistory();
+
+        display.value=result;
+    }
+    catch{
+        display.value="Error";
+    }
+}
+
+function updateHistory(){
+    historyList.innerHTML="";
+
+    history.forEach(item=>{
+        let li=document.createElement("li");
+        li.textContent=item;
+        historyList.appendChild(li);
+    });
+}
+
+function clearHistory(){
+    history=[];
+    updateHistory();
+}
+
+function squareRoot(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=Math.sqrt(value);
+    }
+}
+
+function square(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=Math.pow(value,2);
+    }
+}
+
+function sinDeg(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=Math.sin(value*Math.PI/180).toFixed(6);
+    }
+}
+
+function cosDeg(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=Math.cos(value*Math.PI/180).toFixed(6);
+    }
+}
+
+function tanDeg(){
+    let value=parseFloat(display.value);
+    if(!isNaN(value)){
+        display.value=Math.tan(value*Math.PI/180).toFixed(6);
+    }
+}
+
+
+</script>
+
+</body>
+</html>
